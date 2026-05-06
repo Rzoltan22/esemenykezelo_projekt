@@ -1,5 +1,6 @@
+import EventForm from './components/EventForm';
 import { useState, useEffect } from 'react';
-import { getEvents } from './services/api';
+import { getEvents, registerForEvent } from './services/api';
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -9,13 +10,28 @@ function App() {
     getEvents().then(data => setEvents(data));
   }, []);
 
+  const handleRegister = async (eventId) => {
+     const name = window.prompt("Jelentkezés: Kérlek, add meg a nevedet!");
+     if (!name) return; // Ha üres vagy Mégse-t nyom
+     
+     const email = window.prompt("Jelentkezés: Kérlek, add meg az e-mail címedet!");
+     if (!email) return;
+
+     const result = await registerForEvent(eventId, { name, email });
+     if (result) {
+       alert(`Sikeresen jelentkeztél, ${name}!`);
+     } else {
+       alert("Hiba történt a jelentkezés során.");
+     }
+   };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8 font-sans">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-indigo-600 mb-8 text-center drop-shadow-sm">
           Eseménykezelő Portál
         </h1>
-        
+        <EventForm onEventAdded={() => getEvents().then(data => setEvents(data))} />
         {events.length === 0 ? (
           <div className="bg-white p-8 rounded-xl shadow-md text-center">
             <p className="text-xl text-gray-500 font-medium">Jelenleg nincsenek elérhető események.</p>
@@ -34,7 +50,9 @@ function App() {
                     <span className="flex items-center gap-2">📍 {event.location}</span>
                     <span className="flex items-center gap-2">📅 {new Date(event.date).toLocaleDateString('hu-HU')}</span>
                   </div>
-                  <button className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                  <button 
+                    onClick={() => handleRegister(event.id)}
+                    className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
                     Jelentkezés
                   </button>
                 </div>
