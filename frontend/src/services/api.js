@@ -26,3 +26,28 @@ export const registerForEvent = async (eventId, userData) => {
     console.error('Hiba a jelentkezéskor:', error);
   }
 };
+
+// Esemény törlése
+export const deleteEvent = async (id) => {
+  try {
+    await fetch(`${API_URL}/events/${id}`, {
+      method: 'DELETE'
+    });
+  } catch (error) {
+    console.error('Hiba a törléskor:', error);
+  }
+};
+
+// Esemény szerkesztése
+export const updateEvent = async (id, eventData) => {
+  try {
+    const response = await fetch(`${API_URL}/events/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(eventData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Hiba a szerkesztéskor:', error);
+  }
+};

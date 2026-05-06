@@ -65,6 +65,42 @@ app.post('/api/events/:id/register', async (req, res) => {
   }
 });
 
+// 4. Esemény törlése (DELETE /api/events/:id)
+app.delete('/api/events/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await prisma.event.delete({
+      where: { id: id }
+    });
+    res.status(204).send(); // 204: No Content (Sikeres törlés)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Hiba az esemény törlésekor' });
+  }
+});
+
+// 5. Esemény szerkesztése (PUT /api/events/:id)
+app.put('/api/events/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { title, description, date, location } = req.body;
+    
+    const updatedEvent = await prisma.event.update({
+      where: { id: id },
+      data: {
+        title,
+        description,
+        date: new Date(date),
+        location
+      }
+    });
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Hiba az esemény frissítésekor' });
+  }
+});
+
 // Szerver elindítása
 app.listen(PORT, () => {
   console.log(`🚀 A backend szerver fut a http://localhost:${PORT} címen`);
